@@ -2,7 +2,7 @@
 // 1. CẤU HÌNH & BIẾN TOÀN CỤC
 // ==========================================
 // THAY LINK GOOGLE SCRIPT MỚI NHẤT CỦA BẠN VÀO ĐÂY (NẾU CÓ DEPLOY LẠI)
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAkTidVoXTh674rw-YLQIdDurf8Xh-1ECT7raSMPzVm5I2xWmJV40QNEAufF8Nu0nX/exec'; 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9FYc3lavGPrXe91cj_3O_dONBktj92ZYxuUPgtwuoOWSxNErwXvtmK0JcHH1hBCw4/exec'; 
 const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSd6YfzmkVPwief31DVP7UnzWS6Wz-wiAOlrvr0fkHbMpgq8lw/viewform'; 
 let currentStage = 0; 
 let userName = "Chị";
@@ -267,9 +267,12 @@ function createMonkeys(amount) {
         const monkey = document.createElement('div'); 
         monkey.classList.add('monkey', 'running');
         monkey.innerText = Math.random() > 0.5 ? '🐒' : '🙉';
-        monkey.style.left = (Math.random() * 90) + '%'; 
-        monkey.style.top = (Math.random() * 80) + '%';
-        monkey.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+        // Dạt rộng hơn: 2%-98% ngang, 2%-88% dọc
+        monkey.style.left = (2 + Math.random() * 96) + '%'; 
+        monkey.style.top = (2 + Math.random() * 86) + '%';
+        monkey.style.animationDuration = (Math.random() * 1.5 + 0.8) + 's';
+        // Mỗi con có delay khác nhau để không chạy cùng nhịp
+        monkey.style.animationDelay = (Math.random() * 2) + 's';
         sceneS1.appendChild(monkey); s1_monkeys.push(monkey);
     }
 }
@@ -363,7 +366,7 @@ function gameLoopS2() {
         if (s2_energy < 100) s2_energy += 0.5; 
     } else { 
         if (isBlowing) { 
-            s2_speed *= 0.995; if (s2_speed < 8) s2_speed = 8; 
+            s2_speed *= 0.99; if (s2_speed < 4) s2_speed = 4; 
         } else { 
             if (s2_speed > 0) s2_speed *= 0.96; if (s2_speed < 0.1) s2_speed = 0; 
         } 
@@ -391,7 +394,7 @@ function releaseBreath(e) {
     const now = Date.now(); if (now - lastInteractionTime < 300) return; lastInteractionTime = now;
     if (!s2_isHolding) return; s2_isHolding = false; 
     
-    let boost = 20 + (s2_energy * 1.5); s2_speed = boost; 
+    let boost = 10 + (s2_energy * 0.8); s2_speed = boost; 
     instructionDragon.textContent = "Thở ra ... kéo dài"; instructionDragon.style.color = "#ff5722"; 
     dragonBtn.textContent = "Nhấn giữ để Hít tiếp"; 
     belly.classList.remove("inhaling"); fire.classList.add("active"); mouth.className = "mouth blowing"; 
@@ -402,7 +405,7 @@ function releaseBreath(e) {
             fire.classList.remove("active"); mouth.className = "mouth smile"; 
             instructionDragon.textContent = "Hít vào..."; instructionDragon.style.color = "#006064"; 
         } 
-    }, 2000); 
+    }, 4000); 
 }
 
 const oldBtn = document.getElementById('interaction-area'); 
@@ -901,11 +904,16 @@ function initUsefulnessEval() {
 }
 
 function submitUsefulnessEval() {
-    let parts = [];
+    // Tách từng stage thành field riêng
     for (let i = 1; i <= 7; i++) {
         const slider = document.querySelector(`.sat-slider[data-stage="${i}"]`);
-        const score = slider ? parseInt(slider.value) : 'N/A';
-        parts.push(`Stage ${i}: ${score} điểm`);
+        currentUser['stage' + i + 'Score'] = slider ? parseInt(slider.value) : 0;
+    }
+    
+    // Vẫn giữ chuỗi tổng hợp cho hiển thị local
+    let parts = [];
+    for (let i = 1; i <= 7; i++) {
+        parts.push(`Stage ${i}: ${currentUser['stage' + i + 'Score']} điểm`);
     }
     currentUser.usefulness = parts.join(' | ');
     
