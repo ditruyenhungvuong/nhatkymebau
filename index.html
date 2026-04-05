@@ -172,20 +172,6 @@
         <!-- GIỮ NGUYÊN: Đi thẳng tới Pain Map (không có video xen giữa) -->
         <button id="next-btn-dragon" onclick="switchStage('pain-map')">Tiếp tục hành trình →</button>
     </div>
-
-    <!-- ==========================================
-         STAGE PAIN MAP: BẢN ĐỒ NỖI ĐAU
-         ========================================== -->
-    <div id="stage-pain-map" class="stage" style="display: none;">
-        <div class="welcome-container" style="width: 90%; max-width: 500px; margin: 0 auto; padding: 20px; text-align: center;">
-            <h2 style="color: #b71c1c; margin-bottom: 5px;">Chị đang cảm thấy mỏi ở đâu?</h2>
-            <p style="color: #666; font-size: 15px; margin-bottom: 20px; font-style: italic;">Chạm vào vùng mỏi, chạm lần nữa để hủy</p>
-            <div id="pain-map-svg-container" style="position: relative; width: 320px; height: 480px; transform: scale(0.9); margin: 0 auto;"></div>
-            <!-- submitPainMap() sẽ đi tới Video 3 (xử lý trong JS) -->
-            <button class="btn-start" style="margin-top: 20px; background-color: #d32f2f; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 16px; cursor: pointer; font-weight: bold;" onclick="submitPainMap()">Chuyển sang Thư giãn</button>
-        </div>
-    </div>
-
     <!-- ==========================================
          VIDEO 3: TRƯỚC STAGE 3 (Rà soát cơ thể)
          ========================================== -->
@@ -203,6 +189,18 @@
         </div>
     </div>
 
+    <!-- ==========================================
+         STAGE PAIN MAP: BẢN ĐỒ NỖI ĐAU
+         ========================================== -->
+    <div id="stage-pain-map" class="stage" style="display: none;">
+        <div class="welcome-container" style="width: 90%; max-width: 500px; margin: 0 auto; padding: 20px; text-align: center;">
+            <h2 style="color: #b71c1c; margin-bottom: 5px;">Chị đang cảm thấy mỏi ở đâu?</h2>
+            <p style="color: #666; font-size: 15px; margin-bottom: 20px; font-style: italic;">Chạm vào vùng mỏi, chạm lần nữa để hủy</p>
+            <div id="pain-map-svg-container" style="position: relative; width: 320px; height: 480px; transform: scale(0.9); margin: 0 auto;"></div>
+            <!-- submitPainMap() sẽ đi tới Video 3 (xử lý trong JS) -->
+            <button class="btn-start" style="margin-top: 20px; background-color: #d32f2f; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 16px; cursor: pointer; font-weight: bold;" onclick="submitPainMap()">Chuyển sang Thư giãn</button>
+        </div>
+    </div>
     <!-- ==========================================
          STAGE 3: RÀ SOÁT CƠ THỂ (BODY SCAN)
          ========================================== -->
