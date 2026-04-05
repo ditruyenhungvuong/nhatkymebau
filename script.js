@@ -475,6 +475,15 @@ window.addEventListener('touchend', releaseBreath);
 // ==========================================
 // 8. STAGE PAIN MAP: BẢN ĐỒ NỖI ĐAU
 // ==========================================
+// Xác nhận vùng đau → chuyển sang VIDEO 3 (trước Stage 3)
+function submitPainMap() {
+    let finalResultArray = [];
+    for (let id in selectedPainsThisSession) {
+        finalResultArray.push(selectedPainsThisSession[id]);
+    }
+    currentUser.painAreas = finalResultArray.length > 0 ? finalResultArray.join(', ') : "Không mỏi";
+    switchStage('video-3');  // → Video 3 trước Stage 3
+}
 
 const painAreasConfig = [
     { id: 'head', name: 'Cổ và cơ hàm', points: [{ top: '25%', left: '50%' }], label: { side: 'right', offsetX: 55, offsetY: -5 } },
@@ -590,16 +599,6 @@ function togglePainDot(id, name) {
         selectedPainsThisSession[id] = name;
         dots.forEach(dot => { dot.style.background = '#d32f2f'; dot.style.borderColor = '#b71c1c'; dot.style.boxShadow = '0 0 15px rgba(211, 47, 47, 0.6)'; });
     }
-}
-
-// Xác nhận vùng đau → chuyển sang VIDEO 3 (trước Stage 3)
-function submitPainMap() {
-    let finalResultArray = [];
-    for (let id in selectedPainsThisSession) {
-        finalResultArray.push(selectedPainsThisSession[id]);
-    }
-    currentUser.painAreas = finalResultArray.length > 0 ? finalResultArray.join(', ') : "Không mỏi";
-    switchStage('video-3');  // → Video 3 trước Stage 3
 }
 
 
