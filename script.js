@@ -599,7 +599,7 @@ function submitPainMap() {
         finalResultArray.push(selectedPainsThisSession[id]);
     }
     currentUser.painAreas = finalResultArray.length > 0 ? finalResultArray.join(', ') : "Không mỏi";
-    switchStage('video-3');  // → Video 3 trước Stage 3
+    switchStage(3);  // → Đi thẳng vào Body Scan (bước 2, không qua video)
 }
 
 
