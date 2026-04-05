@@ -482,7 +482,7 @@ function submitPainMap() {
         finalResultArray.push(selectedPainsThisSession[id]);
     }
     currentUser.painAreas = finalResultArray.length > 0 ? finalResultArray.join(', ') : "Không mỏi";
-    switchStage('video-3');  // → Video 3 trước Stage 3
+    switchStage(3);  // → Chuyển sang Stage 3
 }
 
 const painAreasConfig = [
@@ -989,7 +989,7 @@ function goBack() {
         return;
     }
     if (currentStage === 'video-2') { switchStage(1); return; }         // Video 2 → Stage 1
-    if (currentStage === 'video-3') { switchStage('pain-map'); return; } // Video 3 → Pain Map
+    if (currentStage === 'video-3') { switchStage(2); return; } // Video 3 → Pain Map
     if (currentStage === 'video-4') { switchStage(3); return; }         // Video 4 → Stage 3
     if (currentStage === 'video-5') { switchStage(4); return; }         // Video 5 → Stage 4
     if (currentStage === 'video-6') { switchStage(5); return; }         // Video 6 → Stage 5
@@ -997,8 +997,8 @@ function goBack() {
     // --- Game stages: lùi về video hoặc stage trước ---
     if (currentStage === 1) { switchStage('video-1'); return; }         // Stage 1 → Video 1
     if (currentStage === 2) { switchStage('video-2'); return; }         // Stage 2 → Video 2
-    if (currentStage === 'pain-map') { switchStage(2); return; }        // Pain Map → Stage 2
-    if (currentStage === 3) { switchStage('video-3'); return; }         // Stage 3 → Video 3
+    if (currentStage === 'pain-map') { switchStage('video-3'); return; }       // Pain Map → Stage 2
+    if (currentStage === 3) { switchStage('pain-map'); return; }     // Stage 3 → Video 3
     if (currentStage === 4) { switchStage('video-4'); return; }         // Stage 4 → Video 4
     if (currentStage === 5) { switchStage('video-5'); return; }         // Stage 5 → Video 5
     if (currentStage === 6) { switchStage('video-6'); return; }         // Stage 6 → Video 6
