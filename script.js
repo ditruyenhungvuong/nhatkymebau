@@ -990,7 +990,7 @@ function goBack() {
         return;
     }
     if (currentStage === 'video-2') { switchStage(1); return; }         // Video 2 → Stage 1
-    if (currentStage === 'video-3') { switchStage('pain-map'); return; } // Video 3 → Pain Map
+    if (currentStage === 'video-3') { switchStage(2); return; }          // Video 3 → Stage 2 (trước Pain Map)
     if (currentStage === 'video-4') { switchStage(3); return; }         // Video 4 → Stage 3
     if (currentStage === 'video-5') { switchStage(4); return; }         // Video 5 → Stage 4
     if (currentStage === 'video-6') { switchStage(5); return; }         // Video 6 → Stage 5
