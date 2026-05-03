@@ -401,13 +401,14 @@ const dragonBtn = document.getElementById('interaction-area');
 const dragonNextBtn = document.getElementById('next-btn-dragon');
 
 const REQUIRED_DRAGON_BREATHS = 3;
-const DRAGON_BASE_SPIN_SPEED = 4;
-const DRAGON_MAX_SPIN_SPEED = 16;
+const DRAGON_BASE_SPIN_SPEED = 1.2;
+const DRAGON_MAX_SPIN_SPEED = 6;
 
 let s2_rotation = 0;
 let s2_speed = 0;
 let s2_energy = 0;
-let s2_blowSpeed = DRAGON_BASE_SPIN_SPEED;
+let s2_blowSpeed = 0;
+let s2_blowTargetSpeed = DRAGON_BASE_SPIN_SPEED;
 let s2_phase = 'idle'; // idle | inhaling | blowing
 let s2_completedBreaths = 0;
 let s2_lastPointerTime = 0;
@@ -418,7 +419,8 @@ function initDragon() {
     s2_rotation = 0;
     s2_speed = 0;
     s2_energy = 0;
-    s2_blowSpeed = DRAGON_BASE_SPIN_SPEED;
+    s2_blowSpeed = 0;
+    s2_blowTargetSpeed = DRAGON_BASE_SPIN_SPEED;
     s2_phase = 'idle';
     s2_completedBreaths = 0;
     s2_lastPointerTime = 0;
@@ -438,7 +440,7 @@ function initDragon() {
     }
 
     if (instructionDragon) {
-        instructionDragon.textContent = `Nhấn giữ để bé rồng lấy hơi. Khi thả tay, bé rồng sẽ thở ra liên tục. Bấm thêm một lần nữa để dừng. (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+        instructionDragon.textContent = `Nhấn giữ để bé rồng gồng lên lấy hơi. Khi thả tay, bé rồng sẽ thở ra chậm và kéo dài. Bấm thêm một lần nữa để dừng. (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
         instructionDragon.style.color = '#006064';
     }
 
@@ -466,7 +468,7 @@ function continueAfterDragon() {
 
 // Game loop:
 // - Khi đang nhấn giữ: bé rồng đang lấy hơi, mức hơi tăng từ từ.
-// - Khi đã thả tay: bé rồng thở ra liên tục, lửa giữ nguyên, chong chóng quay liên tục theo mức hơi đã tích.
+// - Khi đã thả tay: bé rồng thở ra chậm, kéo dài; chong chóng tăng tốc từ từ theo mức hơi đã tích.
 // - Khi bấm lại để dừng: chong chóng giảm tốc rồi ngừng.
 function gameLoopS2() {
     if (s2_phase === 'inhaling') {
@@ -474,6 +476,8 @@ function gameLoopS2() {
         s2_speed *= 0.88;
         if (s2_speed < 0.05) s2_speed = 0;
     } else if (s2_phase === 'blowing') {
+        // Thở ra chậm và kéo dài: tốc độ chong chóng tăng từ từ tới mức mục tiêu, không giật nhanh ngay.
+        s2_blowSpeed += (s2_blowTargetSpeed - s2_blowSpeed) * 0.025;
         s2_speed = s2_blowSpeed;
     } else {
         s2_speed *= 0.92;
@@ -549,7 +553,8 @@ function releaseDragonToBlow(e) {
     }
 
     s2_phase = 'blowing';
-    s2_blowSpeed = Math.min(DRAGON_MAX_SPIN_SPEED, DRAGON_BASE_SPIN_SPEED + s2_energy * 0.12);
+    s2_blowTargetSpeed = Math.min(DRAGON_MAX_SPIN_SPEED, DRAGON_BASE_SPIN_SPEED + s2_energy * 0.045);
+    s2_blowSpeed = 0.35;
     s2_speed = s2_blowSpeed;
     s2_activePointerId = null;
 
@@ -558,13 +563,13 @@ function releaseDragonToBlow(e) {
     if (mouth) mouth.className = 'mouth blowing';
 
     if (dragonBtn) {
-        dragonBtn.textContent = `Đang thở ra liên tục... bấm để dừng`;
+        dragonBtn.textContent = `Đang thở ra chậm... bấm để dừng`;
         dragonBtn.classList.remove('charging');
         dragonBtn.classList.add('blowing');
     }
 
     if (instructionDragon) {
-        instructionDragon.textContent = `Bé rồng đang thở ra liên tục, chong chóng đang quay. Bấm nút thêm một lần nữa để dừng và ghi nhận 1 nhịp thở. (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+        instructionDragon.textContent = `Bé rồng đang thở ra chậm và kéo dài, chong chóng quay từ từ. Bấm nút thêm một lần nữa để dừng và ghi nhận 1 nhịp thở. (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
         instructionDragon.style.color = '#ff5722';
     }
 }
