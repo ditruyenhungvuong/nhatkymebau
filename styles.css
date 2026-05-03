@@ -1855,3 +1855,16 @@ html, body {
         margin-top: -4px;
     }
 }
+
+
+/* --- PATCH: STAGE 2 - BẤM ĐỂ THỞ RA / BẤM LẠI ĐỂ DỪNG --- */
+#stage-2 #interaction-area.blowing {
+    background-color: #ff5722 !important;
+    border-color: #ff5722 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(255, 87, 34, 0.35) !important;
+}
+
+#stage-2 #interaction-area.blowing:active {
+    background-color: #d84315 !important;
+}
