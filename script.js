@@ -397,16 +397,46 @@ const belly = document.getElementById('belly');
 const fire = document.getElementById('fire');
 const mouth = document.getElementById('mouth');
 const instructionDragon = document.getElementById('instruction-dragon');
-const dragonBtn = document.getElementById('interaction-area');
+let dragonBtn = document.getElementById('interaction-area');
+const dragonNextBtn = document.getElementById('next-btn-dragon');
 
+const REQUIRED_DRAGON_BREATHS = 3;
 let s2_rotation = 0; let s2_speed = 2; let s2_isHolding = false;
 let s2_energy = 0; let fireTimeout = null; let lastInteractionTime = 0;
+let s2_completedBreaths = 0;
 
 function initDragon() {
     s2_speed = 2; s2_rotation = 0; s2_energy = 0; s2_isHolding = false;
+    s2_completedBreaths = 0;
     currentUser.dragonBreaths = 0;
     if (fire) fire.classList.remove("active");
     if (belly) belly.classList.remove("inhaling");
+    if (mouth) mouth.className = "mouth smile";
+    if (dragonBtn) dragonBtn.textContent = "Nhấn giữ";
+    if (instructionDragon) {
+        instructionDragon.textContent = `Nhấn giữ để HÍT VÀO... (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+        instructionDragon.style.color = "#006064";
+    }
+    updateDragonNextState();
+}
+
+function updateDragonNextState() {
+    if (!dragonNextBtn) return;
+    const isReady = s2_completedBreaths >= REQUIRED_DRAGON_BREATHS;
+    dragonNextBtn.disabled = !isReady;
+    dragonNextBtn.classList.toggle('locked', !isReady);
+    dragonNextBtn.textContent = isReady
+        ? "Tiếp tục hành trình →"
+        : `Tiếp tục sau ${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS} nhịp thở`;
+}
+
+function continueAfterDragon() {
+    if (s2_completedBreaths < REQUIRED_DRAGON_BREATHS) {
+        alert(`Chị hãy hoàn thành đủ ${REQUIRED_DRAGON_BREATHS} nhịp thở cùng bé rồng trước khi tiếp tục nhé.`);
+        updateDragonNextState();
+        return;
+    }
+    switchStage('video-3');
 }
 
 // Game loop chong chóng quay
@@ -433,27 +463,48 @@ gameLoopS2();
 function startBreath(e) {
     if (e.cancelable && e.type === 'touchstart') e.preventDefault();
     if (s2_isHolding) return;
-    currentUser.dragonBreaths += 1;
     s2_isHolding = true; s2_energy = 0;
-    instructionDragon.textContent = "Hít sâu..."; instructionDragon.style.color = "#4caf50";
-    dragonBtn.textContent = "Đang hít vào...";
-    belly.classList.add("inhaling"); fire.classList.remove("active");
-    clearTimeout(fireTimeout); mouth.className = "mouth smile";
+    if (instructionDragon) {
+        instructionDragon.textContent = `Hít sâu... (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+        instructionDragon.style.color = "#4caf50";
+    }
+    if (dragonBtn) dragonBtn.textContent = "Đang hít vào...";
+    if (belly) belly.classList.add("inhaling");
+    if (fire) fire.classList.remove("active");
+    clearTimeout(fireTimeout);
+    if (mouth) mouth.className = "mouth smile";
 }
 
 // Thở ra (thả tay)
 function releaseBreath(e) {
     const now = Date.now(); if (now - lastInteractionTime < 300) return; lastInteractionTime = now;
     if (!s2_isHolding) return; s2_isHolding = false;
+    s2_completedBreaths = Math.min(s2_completedBreaths + 1, REQUIRED_DRAGON_BREATHS);
+    currentUser.dragonBreaths = s2_completedBreaths;
     let boost = 10 + (s2_energy * 0.8); s2_speed = boost;
-    instructionDragon.textContent = "Thở ra ... kéo dài"; instructionDragon.style.color = "#ff5722";
-    dragonBtn.textContent = "Nhấn giữ để Hít tiếp";
-    belly.classList.remove("inhaling"); fire.classList.add("active"); mouth.className = "mouth blowing";
+    if (instructionDragon) {
+        instructionDragon.textContent = `Thở ra ... kéo dài (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+        instructionDragon.style.color = "#ff5722";
+    }
+    if (dragonBtn) dragonBtn.textContent = s2_completedBreaths >= REQUIRED_DRAGON_BREATHS ? "Đã đủ 3 nhịp thở" : "Nhấn giữ để Hít tiếp";
+    if (belly) belly.classList.remove("inhaling");
+    if (fire) fire.classList.add("active");
+    if (mouth) mouth.className = "mouth blowing";
+    updateDragonNextState();
     clearTimeout(fireTimeout);
     fireTimeout = setTimeout(() => {
         if (!s2_isHolding) {
-            fire.classList.remove("active"); mouth.className = "mouth smile";
-            instructionDragon.textContent = "Hít vào..."; instructionDragon.style.color = "#006064";
+            if (fire) fire.classList.remove("active");
+            if (mouth) mouth.className = "mouth smile";
+            if (instructionDragon) {
+                if (s2_completedBreaths >= REQUIRED_DRAGON_BREATHS) {
+                    instructionDragon.textContent = "Chị đã hoàn thành đủ 3 nhịp thở. Mình có thể tiếp tục hành trình nhé.";
+                    instructionDragon.style.color = "#00796b";
+                } else {
+                    instructionDragon.textContent = `Hít vào... (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+                    instructionDragon.style.color = "#006064";
+                }
+            }
         }
     }, 4000);
 }
@@ -463,6 +514,7 @@ const oldBtn = document.getElementById('interaction-area');
 if (oldBtn) {
     const newBtn = oldBtn.cloneNode(true);
     oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+    dragonBtn = newBtn;
     newBtn.addEventListener('mousedown', startBreath);
     newBtn.addEventListener('touchstart', startBreath, { passive: false });
 }
@@ -867,45 +919,62 @@ function triggerDroppingHeart() {
 // 13. STAGE ĐÁNH GIÁ SỰ HỮU ÍCH
 // ==========================================
 
-const satisfactionLevels = {
-    1: { text: 'Rất không hài lòng', emoji: '😞', color: '#c62828' },
-    2: { text: 'Không hài lòng', emoji: '😕', color: '#e65100' },
-    3: { text: 'Bình thường', emoji: '😐', color: '#f57f17' },
-    4: { text: 'Hài lòng', emoji: '😊', color: '#558b2f' },
-    5: { text: 'Rất hài lòng', emoji: '😄', color: '#2e7d32' }
+const usefulnessStageNames = {
+    1: 'Chuông "Dừng Lại"',
+    2: 'Thở cùng Rồng',
+    3: 'Cảm nhận nỗi đau',
+    4: 'Rà soát cơ thể',
+    5: 'Gọi tên cảm xúc',
+    6: 'Quan sát suy nghĩ',
+    7: 'Hũ Bình An'
 };
 
-function updateSatLabel(stageNum) {
-    const slider = document.querySelector(`.sat-slider[data-stage="${stageNum}"]`);
-    const label = document.getElementById(`sat-label-${stageNum}`);
-    if (!slider || !label) return;
-    const val = parseInt(slider.value);
-    const data = satisfactionLevels[val];
-    label.innerText = `${data.emoji} ${val}`;
-    label.style.color = data.color;
+function toggleStageTick(stageNum) {
+    const checkbox = document.querySelector(`.stage-useful-checkbox[data-stage="${stageNum}"]`);
+    const block = document.getElementById(`stage-rating-${stageNum}`);
+    const status = document.getElementById(`tick-status-${stageNum}`);
+    if (!checkbox) return;
+
+    if (block) block.classList.toggle('checked', checkbox.checked);
+    if (status) status.textContent = checkbox.checked ? 'Đã tick' : 'Chưa tick';
     if (navigator.vibrate) navigator.vibrate(5);
 }
 
 function initUsefulnessEval() {
     for (let i = 1; i <= 7; i++) {
-        const slider = document.querySelector(`.sat-slider[data-stage="${i}"]`);
-        if (slider) slider.value = 3;
-        updateSatLabel(i);
+        const checkbox = document.querySelector(`.stage-useful-checkbox[data-stage="${i}"]`);
+        if (checkbox) checkbox.checked = false;
+        toggleStageTick(i);
     }
+
+    const noteEl = document.getElementById('evaluation-note') || document.getElementById('other-feedback');
+    if (noteEl) noteEl.value = '';
 }
 
 function submitUsefulnessEval() {
-    for (let i = 1; i <= 7; i++) {
-        const slider = document.querySelector(`.sat-slider[data-stage="${i}"]`);
-        currentUser['stage' + i + 'Score'] = slider ? parseInt(slider.value) : 0;
-    }
     let parts = [];
+
     for (let i = 1; i <= 7; i++) {
-        parts.push(`Stage ${i}: ${currentUser['stage' + i + 'Score']} điểm`);
+        const checkbox = document.querySelector(`.stage-useful-checkbox[data-stage="${i}"]`);
+        const isChecked = checkbox ? checkbox.checked : false;
+        const textValue = isChecked ? 'Có' : 'Không';
+
+        // Lưu dạng tick mới
+        currentUser['stage' + i + 'Useful'] = textValue;
+
+        // Giữ thêm field cũ dạng số để Google Sheet cũ không bị vỡ cột: Có = 1, Không = 0
+        currentUser['stage' + i + 'Score'] = isChecked ? 1 : 0;
+
+        parts.push(`Stage ${i} - ${usefulnessStageNames[i]}: ${textValue}`);
     }
+
     currentUser.usefulness = parts.join(' | ');
-    const feedbackEl = document.getElementById('other-feedback');
-    currentUser.otherFeedback = feedbackEl ? feedbackEl.value.trim() : '';
+
+    const feedbackEl = document.getElementById('evaluation-note') || document.getElementById('other-feedback');
+    const note = feedbackEl ? feedbackEl.value.trim() : '';
+    currentUser.evaluationNote = note;
+    currentUser.otherFeedback = note;
+
     finishJourney();
 }
 
