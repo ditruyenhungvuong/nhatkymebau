@@ -397,26 +397,41 @@ const belly = document.getElementById('belly');
 const fire = document.getElementById('fire');
 const mouth = document.getElementById('mouth');
 const instructionDragon = document.getElementById('instruction-dragon');
-let dragonBtn = document.getElementById('interaction-area');
+const dragonBtn = document.getElementById('interaction-area');
 const dragonNextBtn = document.getElementById('next-btn-dragon');
 
 const REQUIRED_DRAGON_BREATHS = 3;
-let s2_rotation = 0; let s2_speed = 2; let s2_isHolding = false;
-let s2_energy = 0; let fireTimeout = null; let lastInteractionTime = 0;
+const DRAGON_SPIN_SPEED = 8;
+let s2_rotation = 0;
+let s2_speed = 0;
+let s2_isBlowing = false;
 let s2_completedBreaths = 0;
+let s2_lastTapTime = 0;
 
 function initDragon() {
-    s2_speed = 2; s2_rotation = 0; s2_energy = 0; s2_isHolding = false;
+    s2_rotation = 0;
+    s2_speed = 0;
+    s2_isBlowing = false;
     s2_completedBreaths = 0;
+    s2_lastTapTime = 0;
     currentUser.dragonBreaths = 0;
-    if (fire) fire.classList.remove("active");
-    if (belly) belly.classList.remove("inhaling");
-    if (mouth) mouth.className = "mouth smile";
-    if (dragonBtn) dragonBtn.textContent = "Nhấn giữ";
-    if (instructionDragon) {
-        instructionDragon.textContent = `Nhấn giữ để HÍT VÀO... (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
-        instructionDragon.style.color = "#006064";
+
+    if (pinwheel) pinwheel.style.transform = 'rotate(0deg)';
+    if (fire) fire.classList.remove('active');
+    if (belly) belly.classList.remove('inhaling');
+    if (mouth) mouth.className = 'mouth smile';
+
+    if (dragonBtn) {
+        dragonBtn.textContent = `Bấm để thở ra (0/${REQUIRED_DRAGON_BREATHS})`;
+        dragonBtn.classList.remove('blowing');
+        dragonBtn.disabled = false;
     }
+
+    if (instructionDragon) {
+        instructionDragon.textContent = `Bấm nút để bé rồng thở ra. Bấm lại để dừng và ghi nhận 1 nhịp thở. (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+        instructionDragon.style.color = '#006064';
+    }
+
     updateDragonNextState();
 }
 
@@ -426,7 +441,7 @@ function updateDragonNextState() {
     dragonNextBtn.disabled = !isReady;
     dragonNextBtn.classList.toggle('locked', !isReady);
     dragonNextBtn.textContent = isReady
-        ? "Tiếp tục hành trình →"
+        ? 'Tiếp tục hành trình →'
         : `Tiếp tục sau ${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS} nhịp thở`;
 }
 
@@ -439,90 +454,94 @@ function continueAfterDragon() {
     switchStage('video-3');
 }
 
-// Game loop chong chóng quay
+// Game loop: khi đang thở ra, chong chóng quay liên tục; khi bấm dừng, chong chóng giảm tốc rồi ngừng.
 function gameLoopS2() {
-    const isBlowing = fire && fire.classList.contains('active');
-    if (s2_isHolding) {
-        s2_speed = s2_speed * 0.9;
-        if (s2_speed < 0.1) s2_speed = 0;
-        if (s2_energy < 100) s2_energy += 0.5;
+    if (s2_isBlowing) {
+        s2_speed = DRAGON_SPIN_SPEED;
     } else {
-        if (isBlowing) {
-            s2_speed *= 0.99; if (s2_speed < 4) s2_speed = 4;
-        } else {
-            if (s2_speed > 0) s2_speed *= 0.96; if (s2_speed < 0.1) s2_speed = 0;
-        }
+        s2_speed *= 0.92;
+        if (s2_speed < 0.05) s2_speed = 0;
     }
+
     s2_rotation += s2_speed;
     if (pinwheel) pinwheel.style.transform = `rotate(${s2_rotation}deg)`;
     requestAnimationFrame(gameLoopS2);
 }
 gameLoopS2();
 
-// Hít vào (nhấn giữ)
-function startBreath(e) {
-    if (e.cancelable && e.type === 'touchstart') e.preventDefault();
-    if (s2_isHolding) return;
-    s2_isHolding = true; s2_energy = 0;
-    if (instructionDragon) {
-        instructionDragon.textContent = `Hít sâu... (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
-        instructionDragon.style.color = "#4caf50";
+function startDragonBlow() {
+    if (s2_completedBreaths >= REQUIRED_DRAGON_BREATHS) {
+        if (instructionDragon) {
+            instructionDragon.textContent = 'Chị đã hoàn thành đủ 3 nhịp thở. Mình có thể tiếp tục hành trình nhé.';
+            instructionDragon.style.color = '#00796b';
+        }
+        return;
     }
-    if (dragonBtn) dragonBtn.textContent = "Đang hít vào...";
-    if (belly) belly.classList.add("inhaling");
-    if (fire) fire.classList.remove("active");
-    clearTimeout(fireTimeout);
-    if (mouth) mouth.className = "mouth smile";
+
+    s2_isBlowing = true;
+    s2_speed = DRAGON_SPIN_SPEED;
+
+    if (fire) fire.classList.add('active');
+    if (belly) belly.classList.add('inhaling');
+    if (mouth) mouth.className = 'mouth blowing';
+    if (dragonBtn) {
+        dragonBtn.textContent = 'Đang thở ra... bấm để dừng';
+        dragonBtn.classList.add('blowing');
+    }
+    if (instructionDragon) {
+        instructionDragon.textContent = `Bé rồng đang thở ra... chong chóng đang quay. Bấm lại để dừng. (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+        instructionDragon.style.color = '#ff5722';
+    }
 }
 
-// Thở ra (thả tay)
-function releaseBreath(e) {
-    const now = Date.now(); if (now - lastInteractionTime < 300) return; lastInteractionTime = now;
-    if (!s2_isHolding) return; s2_isHolding = false;
+function stopDragonBlow() {
+    if (!s2_isBlowing) return;
+
+    s2_isBlowing = false;
     s2_completedBreaths = Math.min(s2_completedBreaths + 1, REQUIRED_DRAGON_BREATHS);
     currentUser.dragonBreaths = s2_completedBreaths;
-    let boost = 10 + (s2_energy * 0.8); s2_speed = boost;
-    if (instructionDragon) {
-        instructionDragon.textContent = `Thở ra ... kéo dài (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
-        instructionDragon.style.color = "#ff5722";
-    }
-    if (dragonBtn) dragonBtn.textContent = s2_completedBreaths >= REQUIRED_DRAGON_BREATHS ? "Đã đủ 3 nhịp thở" : "Nhấn giữ để Hít tiếp";
-    if (belly) belly.classList.remove("inhaling");
-    if (fire) fire.classList.add("active");
-    if (mouth) mouth.className = "mouth blowing";
+
+    if (fire) fire.classList.remove('active');
+    if (belly) belly.classList.remove('inhaling');
+    if (mouth) mouth.className = 'mouth smile';
+    if (dragonBtn) dragonBtn.classList.remove('blowing');
+
     updateDragonNextState();
-    clearTimeout(fireTimeout);
-    fireTimeout = setTimeout(() => {
-        if (!s2_isHolding) {
-            if (fire) fire.classList.remove("active");
-            if (mouth) mouth.className = "mouth smile";
-            if (instructionDragon) {
-                if (s2_completedBreaths >= REQUIRED_DRAGON_BREATHS) {
-                    instructionDragon.textContent = "Chị đã hoàn thành đủ 3 nhịp thở. Mình có thể tiếp tục hành trình nhé.";
-                    instructionDragon.style.color = "#00796b";
-                } else {
-                    instructionDragon.textContent = `Hít vào... (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
-                    instructionDragon.style.color = "#006064";
-                }
-            }
+
+    if (s2_completedBreaths >= REQUIRED_DRAGON_BREATHS) {
+        if (dragonBtn) dragonBtn.textContent = 'Đã đủ 3 nhịp thở';
+        if (instructionDragon) {
+            instructionDragon.textContent = 'Chị đã hoàn thành đủ 3 nhịp thở. Mình có thể tiếp tục hành trình nhé.';
+            instructionDragon.style.color = '#00796b';
         }
-    }, 4000);
+    } else {
+        if (dragonBtn) dragonBtn.textContent = `Bấm để thở ra tiếp (${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS})`;
+        if (instructionDragon) {
+            instructionDragon.textContent = `Đã ghi nhận ${s2_completedBreaths}/${REQUIRED_DRAGON_BREATHS} nhịp thở. Bấm nút để tiếp tục nhịp thở kế tiếp.`;
+            instructionDragon.style.color = '#006064';
+        }
+    }
 }
 
-// Gắn event cho nút hít thở
-const oldBtn = document.getElementById('interaction-area');
-if (oldBtn) {
-    const newBtn = oldBtn.cloneNode(true);
-    oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-    dragonBtn = newBtn;
-    newBtn.addEventListener('mousedown', startBreath);
-    newBtn.addEventListener('touchstart', startBreath, { passive: false });
-}
-window.removeEventListener('mouseup', releaseBreath);
-window.removeEventListener('touchend', releaseBreath);
-window.addEventListener('mouseup', releaseBreath);
-window.addEventListener('touchend', releaseBreath);
+function toggleDragonBreath(e) {
+    if (e && e.cancelable) e.preventDefault();
 
+    // Chống double-fire trên thiết bị cảm ứng khi touch và click cùng chạy.
+    const now = Date.now();
+    if (now - s2_lastTapTime < 250) return;
+    s2_lastTapTime = now;
+
+    if (s2_isBlowing) {
+        stopDragonBlow();
+    } else {
+        startDragonBlow();
+    }
+}
+
+if (dragonBtn) {
+    dragonBtn.addEventListener('click', toggleDragonBreath);
+    dragonBtn.addEventListener('touchend', toggleDragonBreath, { passive: false });
+}
 
 // ==========================================
 // 8. STAGE PAIN MAP: BẢN ĐỒ NỖI ĐAU
