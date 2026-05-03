@@ -170,7 +170,7 @@
         </div>
         <button id="interaction-area">Nhấn giữ</button>
         <!-- GIỮ NGUYÊN: Đi thẳng tới Pain Map (không có video xen giữa) -->
-        <button id="next-btn-dragon" onclick="switchStage('video-3')">Tiếp tục hành trình →</button>
+        <button id="next-btn-dragon" onclick="continueAfterDragon()" disabled>Tiếp tục sau 0/3 nhịp thở</button>
     </div>
     <!-- ==========================================
          VIDEO 3: TRƯỚC STAGE 3 (Rà soát cơ thể)
@@ -354,87 +354,79 @@
          STAGE USEFULNESS: ĐÁNH GIÁ SỰ HỮU ÍCH
          ========================================== -->
     <div id="stage-usefulness" class="stage">
-        <div class="welcome-container" style="width: 90%; max-width: 500px; margin: 0 auto; padding: 20px; text-align: center; background: white; border-radius: 20px; max-height: 90vh; overflow-y: auto;">
-            <h2 style="color: black; font-weight: 900; margin-bottom: 5px;">Đánh giá sự hữu ích</h2>
-            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Kéo thanh trượt để đánh giá từng giai đoạn</p>
+        <div class="usefulness-container">
+            <h2>Đánh giá sự hữu ích</h2>
+            <p class="usefulness-intro">Chị tick vào những giai đoạn mà chị cảm thấy có ích với mình.</p>
 
-            <!-- Đánh giá Stage 1 -->
-            <div id="stage-rating-1" class="stage-rating-block" style="background:#f5f5f5; padding:12px 15px; border-radius:12px; margin-bottom:10px; text-align:left;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <span style="font-size:13px; font-weight:bold; color:#00796b;">1. Chuông "Dừng Lại"</span>
-                    <span id="sat-label-1" style="font-size:13px; font-weight:bold; color:#f57f17;">😐 3</span>
-                </div>
-                <input type="range" class="sat-slider" data-stage="1" min="1" max="5" value="3" oninput="updateSatLabel(1)" style="width:100%; height:10px; border-radius:8px; outline:none; -webkit-appearance:none; cursor:pointer; background:linear-gradient(to right, #ef5350, #ff9800, #fdd835, #66bb6a, #2e7d32);">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa; margin-top:3px;"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div>
+            <div class="stage-rating-block" id="stage-rating-1">
+                <label class="stage-tick-row" for="stage-check-1">
+                    <input type="checkbox" id="stage-check-1" class="stage-useful-checkbox" data-stage="1" onchange="toggleStageTick(1)">
+                    <span class="custom-check"></span>
+                    <span class="stage-title">1. Chuông "Dừng Lại"</span>
+                    <span class="tick-status" id="tick-status-1">Chưa tick</span>
+                </label>
             </div>
 
-            <!-- Đánh giá Stage 2 -->
-            <div id="stage-rating-2" class="stage-rating-block" style="background:#f5f5f5; padding:12px 15px; border-radius:12px; margin-bottom:10px; text-align:left;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <span style="font-size:13px; font-weight:bold; color:#00796b;">2. Thở cùng Rồng</span>
-                    <span id="sat-label-2" style="font-size:13px; font-weight:bold; color:#f57f17;">😐 3</span>
-                </div>
-                <input type="range" class="sat-slider" data-stage="2" min="1" max="5" value="3" oninput="updateSatLabel(2)" style="width:100%; height:10px; border-radius:8px; outline:none; -webkit-appearance:none; cursor:pointer; background:linear-gradient(to right, #ef5350, #ff9800, #fdd835, #66bb6a, #2e7d32);">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa; margin-top:3px;"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div>
+            <div class="stage-rating-block" id="stage-rating-2">
+                <label class="stage-tick-row" for="stage-check-2">
+                    <input type="checkbox" id="stage-check-2" class="stage-useful-checkbox" data-stage="2" onchange="toggleStageTick(2)">
+                    <span class="custom-check"></span>
+                    <span class="stage-title">2. Thở cùng Rồng</span>
+                    <span class="tick-status" id="tick-status-2">Chưa tick</span>
+                </label>
             </div>
 
-            <!-- Đánh giá Stage 3 -->
-            <div id="stage-rating-3" class="stage-rating-block" style="background:#f5f5f5; padding:12px 15px; border-radius:12px; margin-bottom:10px; text-align:left;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <span style="font-size:13px; font-weight:bold; color:#00796b;">3. Cảm nhận nỗi đau</span>
-                    <span id="sat-label-3" style="font-size:13px; font-weight:bold; color:#f57f17;">😐 3</span>
-                </div>
-                <input type="range" class="sat-slider" data-stage="3" min="1" max="5" value="3" oninput="updateSatLabel(3)" style="width:100%; height:10px; border-radius:8px; outline:none; -webkit-appearance:none; cursor:pointer; background:linear-gradient(to right, #ef5350, #ff9800, #fdd835, #66bb6a, #2e7d32);">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa; margin-top:3px;"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div>
+            <div class="stage-rating-block" id="stage-rating-3">
+                <label class="stage-tick-row" for="stage-check-3">
+                    <input type="checkbox" id="stage-check-3" class="stage-useful-checkbox" data-stage="3" onchange="toggleStageTick(3)">
+                    <span class="custom-check"></span>
+                    <span class="stage-title">3. Cảm nhận nỗi đau</span>
+                    <span class="tick-status" id="tick-status-3">Chưa tick</span>
+                </label>
             </div>
 
-            <!-- Đánh giá Stage 4 -->
-            <div id="stage-rating-4" class="stage-rating-block" style="background:#f5f5f5; padding:12px 15px; border-radius:12px; margin-bottom:10px; text-align:left;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <span style="font-size:13px; font-weight:bold; color:#00796b;">4. Rà soát cơ thể</span>
-                    <span id="sat-label-4" style="font-size:13px; font-weight:bold; color:#f57f17;">😐 3</span>
-                </div>
-                <input type="range" class="sat-slider" data-stage="4" min="1" max="5" value="3" oninput="updateSatLabel(4)" style="width:100%; height:10px; border-radius:8px; outline:none; -webkit-appearance:none; cursor:pointer; background:linear-gradient(to right, #ef5350, #ff9800, #fdd835, #66bb6a, #2e7d32);">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa; margin-top:3px;"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div>
+            <div class="stage-rating-block" id="stage-rating-4">
+                <label class="stage-tick-row" for="stage-check-4">
+                    <input type="checkbox" id="stage-check-4" class="stage-useful-checkbox" data-stage="4" onchange="toggleStageTick(4)">
+                    <span class="custom-check"></span>
+                    <span class="stage-title">4. Rà soát cơ thể</span>
+                    <span class="tick-status" id="tick-status-4">Chưa tick</span>
+                </label>
             </div>
 
-            <!-- Đánh giá Stage 5 -->
-            <div id="stage-rating-5" class="stage-rating-block" style="background:#f5f5f5; padding:12px 15px; border-radius:12px; margin-bottom:10px; text-align:left;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <span style="font-size:13px; font-weight:bold; color:#00796b;">5. Gọi tên cảm xúc</span>
-                    <span id="sat-label-5" style="font-size:13px; font-weight:bold; color:#f57f17;">😐 3</span>
-                </div>
-                <input type="range" class="sat-slider" data-stage="5" min="1" max="5" value="3" oninput="updateSatLabel(5)" style="width:100%; height:10px; border-radius:8px; outline:none; -webkit-appearance:none; cursor:pointer; background:linear-gradient(to right, #ef5350, #ff9800, #fdd835, #66bb6a, #2e7d32);">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa; margin-top:3px;"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div>
+            <div class="stage-rating-block" id="stage-rating-5">
+                <label class="stage-tick-row" for="stage-check-5">
+                    <input type="checkbox" id="stage-check-5" class="stage-useful-checkbox" data-stage="5" onchange="toggleStageTick(5)">
+                    <span class="custom-check"></span>
+                    <span class="stage-title">5. Gọi tên cảm xúc</span>
+                    <span class="tick-status" id="tick-status-5">Chưa tick</span>
+                </label>
             </div>
 
-            <!-- Đánh giá Stage 6 -->
-            <div id="stage-rating-6" class="stage-rating-block" style="background:#f5f5f5; padding:12px 15px; border-radius:12px; margin-bottom:10px; text-align:left;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <span style="font-size:13px; font-weight:bold; color:#00796b;">6. Quan sát suy nghĩ</span>
-                    <span id="sat-label-6" style="font-size:13px; font-weight:bold; color:#f57f17;">😐 3</span>
-                </div>
-                <input type="range" class="sat-slider" data-stage="6" min="1" max="5" value="3" oninput="updateSatLabel(6)" style="width:100%; height:10px; border-radius:8px; outline:none; -webkit-appearance:none; cursor:pointer; background:linear-gradient(to right, #ef5350, #ff9800, #fdd835, #66bb6a, #2e7d32);">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa; margin-top:3px;"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div>
+            <div class="stage-rating-block" id="stage-rating-6">
+                <label class="stage-tick-row" for="stage-check-6">
+                    <input type="checkbox" id="stage-check-6" class="stage-useful-checkbox" data-stage="6" onchange="toggleStageTick(6)">
+                    <span class="custom-check"></span>
+                    <span class="stage-title">6. Quan sát suy nghĩ</span>
+                    <span class="tick-status" id="tick-status-6">Chưa tick</span>
+                </label>
             </div>
 
-            <!-- Đánh giá Stage 7 -->
-            <div id="stage-rating-7" class="stage-rating-block" style="background:#f5f5f5; padding:12px 15px; border-radius:12px; margin-bottom:15px; text-align:left;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <span style="font-size:13px; font-weight:bold; color:#00796b;">7. Hũ Bình An</span>
-                    <span id="sat-label-7" style="font-size:13px; font-weight:bold; color:#f57f17;">😐 3</span>
-                </div>
-                <input type="range" class="sat-slider" data-stage="7" min="1" max="5" value="3" oninput="updateSatLabel(7)" style="width:100%; height:10px; border-radius:8px; outline:none; -webkit-appearance:none; cursor:pointer; background:linear-gradient(to right, #ef5350, #ff9800, #fdd835, #66bb6a, #2e7d32);">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa; margin-top:3px;"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div>
+            <div class="stage-rating-block" id="stage-rating-7">
+                <label class="stage-tick-row" for="stage-check-7">
+                    <input type="checkbox" id="stage-check-7" class="stage-useful-checkbox" data-stage="7" onchange="toggleStageTick(7)">
+                    <span class="custom-check"></span>
+                    <span class="stage-title">7. Hũ Bình An</span>
+                    <span class="tick-status" id="tick-status-7">Chưa tick</span>
+                </label>
             </div>
 
-            <!-- Ý kiến khác -->
-            <div style="background:#f5f5f5; padding:12px 15px; border-radius:12px; margin-bottom:15px; text-align:left;">
-                <div style="font-size:13px; font-weight:bold; color:#00796b; margin-bottom:8px;">💬 Ý kiến khác</div>
-                <textarea id="other-feedback" placeholder="Chị có góp ý gì thêm không ạ? (không bắt buộc)" style="width:100%; min-height:80px; padding:10px; border:2px solid #e0e0e0; border-radius:10px; font-size:14px; resize:vertical; outline:none; box-sizing:border-box; font-family:inherit;" onfocus="this.style.borderColor='#00897b'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
+            <div class="evaluation-note-block">
+                <div class="evaluation-note-title">💬 Ghi nhận đánh giá</div>
+                <textarea id="evaluation-note" placeholder="Chị có thể ghi nhận cảm nhận, góp ý hoặc điều chị muốn nhắn lại sau hành trình..." onfocus="this.style.borderColor='#00897b'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
             </div>
 
-            <button id="finish-eval-btn" onclick="submitUsefulnessEval()" style="background: #d81b60; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 16px; cursor: pointer; font-weight: bold; width: 100%;">Hoàn thành hành trình</button>
+            <button id="finish-eval-btn" onclick="submitUsefulnessEval()">Hoàn thành hành trình</button>
         </div>
     </div>
 
