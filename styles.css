@@ -1674,3 +1674,184 @@ html, body {
         margin-top: 35px;
     }
 }
+
+
+/* --- PATCH: STAGE 2 - BẮT BUỘC ĐỦ 3 NHỊP THỞ --- */
+#stage-2 #next-btn-dragon:disabled,
+#stage-2 #next-btn-dragon.locked {
+    background-color: #b0bec5 !important;
+    color: #ffffff !important;
+    cursor: not-allowed !important;
+    opacity: 0.75 !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+#stage-2 #next-btn-dragon:not(:disabled) {
+    background-color: #00838f !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+}
+
+/* --- PATCH: ĐÁNH GIÁ 7 STAGE DẠNG TICK --- */
+#stage-usefulness.active {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.usefulness-container {
+    width: 90%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 0 auto;
+    padding: 22px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    box-sizing: border-box;
+}
+
+.usefulness-container h2 {
+    color: #004d40;
+    font-weight: 900;
+    margin: 0 0 6px;
+}
+
+.usefulness-intro {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 16px;
+}
+
+#stage-usefulness .stage-rating-block {
+    background: #f5f5f5;
+    border: 2px solid transparent;
+    padding: 12px 14px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+#stage-usefulness .stage-rating-block.checked {
+    background: #e0f2f1;
+    border-color: #26a69a;
+}
+
+.stage-tick-row {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: #004d40;
+}
+
+.stage-useful-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.custom-check {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid #80cbc4;
+    background: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.stage-useful-checkbox:checked + .custom-check {
+    background: #00897b;
+    border-color: #00897b;
+}
+
+.stage-useful-checkbox:checked + .custom-check::after {
+    content: '✓';
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.stage-title {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.tick-status {
+    font-size: 12px;
+    font-weight: 700;
+    color: #78909c;
+    white-space: nowrap;
+}
+
+.stage-rating-block.checked .tick-status {
+    color: #00796b;
+}
+
+.evaluation-note-block {
+    background: #f5f5f5;
+    padding: 12px 15px;
+    border-radius: 16px;
+    margin: 14px 0 16px;
+    text-align: left;
+}
+
+.evaluation-note-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: #00796b;
+    margin-bottom: 8px;
+}
+
+#evaluation-note {
+    width: 100%;
+    min-height: 95px;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    background: white;
+}
+
+#finish-eval-btn {
+    background: #d81b60;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    box-shadow: 0 5px 14px rgba(216, 27, 96, 0.25);
+}
+
+#finish-eval-btn:active {
+    transform: scale(0.98);
+}
+
+@media (max-width: 420px) {
+    .stage-tick-row {
+        grid-template-columns: 30px 1fr;
+    }
+    .tick-status {
+        grid-column: 2;
+        margin-top: -4px;
+    }
+}
