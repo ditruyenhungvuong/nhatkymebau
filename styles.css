@@ -1868,3 +1868,27 @@ html, body {
 #stage-2 #interaction-area.blowing:active {
     background-color: #d84315 !important;
 }
+
+
+/* --- PATCH V3: STAGE 2 - NHẤN GIỮ LẤY HƠI, THẢ RA GIỮ THỞ LIÊN TỤC --- */
+#stage-2 #interaction-area.charging {
+    background-color: #4caf50 !important;
+    border-color: #4caf50 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(76, 175, 80, 0.35) !important;
+}
+
+#stage-2 #interaction-area.charging:active {
+    background-color: #388e3c !important;
+}
+
+#stage-2 #interaction-area.blowing {
+    background-color: #ff5722 !important;
+    border-color: #ff5722 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(255, 87, 34, 0.35) !important;
+}
+
+#stage-2 #interaction-area.blowing:active {
+    background-color: #d84315 !important;
+}
